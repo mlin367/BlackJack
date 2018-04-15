@@ -1,6 +1,6 @@
 import cards
 
-class Players:
+class Playerss:
 
     def __init__(self):
         try:
