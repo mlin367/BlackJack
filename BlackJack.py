@@ -1,6 +1,6 @@
 import cards
 
-class Playerss:
+class Players:
 
     def __init__(self):
         try:
@@ -17,7 +17,7 @@ class Playerss:
     def playervalues(self):
         playerdict = {}
         for names in self.names:
-            playerdict[names] = 0
+            playerdict[names] = {'Points' : 0, 'Aces' : 0}
         return playerdict
 
 class GameSetup:
@@ -36,7 +36,7 @@ class GameSetup:
     
 def main():
 
-    inv_values = {'Ace': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'Jack': 10, 'Queen': 10, 'King': 10}
+    inv_values = {'Ace': 0, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'Jack': 10, 'Queen': 10, 'King': 10}
     
     p = Players()
     playerdict = p.playervalues()
@@ -48,34 +48,47 @@ def main():
     
     for n in names:
         assign = g.cardassign()
-        playerdict[n] = inv_values[assign[0][0]] + inv_values[assign[1][0]]
+        if assign[0][0] == 'Ace':
+            playerdict[n]['Aces'] += 1
+        elif assign[1][0] == 'Ace':
+            playerdict[n]['Aces'] += 1
+        playerdict[n]['Points'] = inv_values[assign[0][0]] + inv_values[assign[1][0]]
         print(n, ",this is the hand dealt to you: ", assign)
     print("\nThe sum of your hands: ", playerdict)
+    print("Aces can be decided to be one or eleven once a player stops hitting")
 
     for n in names:
         hitchoice = "y"
         print("\nIt is your turn, ", n)
-        while playerdict[n] < 21 and hitchoice == 'y':
+        while playerdict[n]['Points'] < 21 and hitchoice == 'y':
             print("\nYour hand: ", playerdict[n])
             hitchoice = input("hit? (y/n): ")
             while hitchoice != 'y' and hitchoice != 'n':
                 hitchoice = input("You need to enter a 'y' or 'n'!: ")
             if hitchoice == 'y':
                 h = g.hit()
-                playerdict[n] += inv_values[h[0]]
+                print('You drew a(n) {}.'.format(h[0]))
+                if h[0] == 'Ace':
+                    playerdict[n]['Aces'] += 1
+                playerdict[n]['Points'] += inv_values[h[0]]
             elif hitchoice == 'n':
+                if playerdict[n]['Aces'] != 0:
+                    for i in range(playerdict[n]['Aces']):
+                        decision = input("#{} Ace to be 1 or 11? ".format(i+1))
+                        playerdict[n]['Points'] += int(decision)
                 print("Your final hand: ", playerdict[n])
-        if playerdict[n] > 21:
+        if playerdict[n]['Points'] > 21:
             print("Your hand: ", playerdict[n], "\nBust!")
-        elif playerdict[n] == 21:
+        elif playerdict[n]['Points'] == 21:
             print("Blackjack!")
     
     winnerscore = 0
     busts = []
     losers = []
     winner = []
-    sortNames = sorted(playerdict, key = playerdict.__getitem__, reverse = True)
-    sortValues = sorted(playerdict.values(), reverse = True)
+    playerdictnew = {k:v for (k,v) in zip(list(playerdict.keys()), [x['Points'] for x in list(playerdict.values())])}
+    sortNames = sorted(playerdictnew, key = playerdictnew.__getitem__, reverse = True)
+    sortValues = sorted(playerdictnew.values(), reverse = True)
     gameoutcomedict = {k:v for (k,v) in zip(sortNames,sortValues)}
     
     for n in sortNames:
