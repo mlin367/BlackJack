@@ -50,7 +50,7 @@ def main():
         assign = g.cardassign()
         if assign[0][0] == 'Ace':
             playerdict[n]['Aces'] += 1
-        elif assign[1][0] == 'Ace':
+        if assign[1][0] == 'Ace':
             playerdict[n]['Aces'] += 1
         playerdict[n]['Points'] = inv_values[assign[0][0]] + inv_values[assign[1][0]]
         print(n, ",this is the hand dealt to you: ", assign)
